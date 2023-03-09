@@ -1,0 +1,194 @@
+<!DOCTYPE html PUBLIC '-//W3C//DTD XHTML 1.0 Transitional//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd'>
+<html xmlns='http://www.w3.org/1999/xhtml' xml:lang='en' lang='en'>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- <link rel="shortcut icon" type="image/vnd.microsoft.icon" href="../favicon.ico" /> -->
+
+    <title>Computer Graphics - PA1</title>
+
+    <link href="resources/bootstrap.min.css" rel="stylesheet">
+    <link href="resources/offcanvas.css" rel="stylesheet">
+    <link href="resources/custom2014.css" rel="stylesheet">
+    <link href="resources/twentytwenty.css" rel="stylesheet" type="text/css" />
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+    <script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+</head>
+
+<body>
+
+<div class="container headerBar">
+		<h1>Programming Assignment 3 - Liu Rongxing</h1>
+</div>
+
+<div class="container contentWrapper">
+<div class="pageContent">
+
+	<!-- ================================================================= -->
+
+	<h2>Part 1: Light Sampling</h2>
+
+    <p>The modified files are arealight.cpp and direct_ems.cpp. This task took about three days.</p>
+
+	<h3>Integrator Implementation</h3>
+
+    <p>The implementation of direct_ems.cpp is similar to direct.cpp except that this time we have to check that whether the first intersection
+        point is part of an emitter itself. If so, we need to add its radiance to the final result.
+    </p>
+
+    <h3>Shape Area Light</h3>
+
+    <p>Implementing pdf() in arealight.cpp is tricky. It has to be able to calculate the pdf independently from sample(). In addition, 
+        the result should be converted to solid angle form by multiplying with squared distance between the first and second intersection 
+        points then divided by the cosine between incident ray and normal. $$p_\Omega(\overrightarrow{\omega})=p_A(x)\frac{d^2}{cos\theta}$$</p>
+
+    <h3>Validation</h3>
+
+    <p>We passed the first five tests in test-mesh.xml and the first two tests in test-mesh-furnace.xml. The renderred images look similar to
+        the reference images except for some small errors due to the stochastic nature of Monte-Carlo integration.
+    </p>
+
+    <div class="twentytwenty-container">
+	    <img src="images/reference/point_ems.png" alt="Reference" class="img-responsive">
+	    <img src="images/mine/point_ems.png" alt="Mine" class="img-responsive">
+	</div> <br>
+    <div class="twentytwenty-container">
+	    <img src="images/reference/sphere_ems.png" alt="Reference" class="img-responsive">
+	    <img src="images/mine/sphere_ems.png" alt="Mine" class="img-responsive">
+	</div> <br>
+    <div class="twentytwenty-container">
+	    <img src="images/reference/sphere2_ems.png" alt="Reference" class="img-responsive">
+	    <img src="images/mine/sphere2_ems.png" alt="Mine" class="img-responsive">
+	</div> <br>
+    <div class="twentytwenty-container">
+	    <img src="images/reference/sphere_mesh_ems.png" alt="Reference" class="img-responsive">
+	    <img src="images/mine/sphere_mesh_ems.png" alt="Mine" class="img-responsive">
+	</div> <br>
+    <div class="twentytwenty-container">
+	    <img src="images/reference/sphere2_mesh_ems.png" alt="Reference" class="img-responsive">
+	    <img src="images/mine/sphere2_mesh_ems.png" alt="Mine" class="img-responsive">
+	</div> <br>
+    <div class="twentytwenty-container">
+	    <img src="images/reference/odyssey_ems.png" alt="Reference" class="img-responsive">
+	    <img src="images/mine/odyssey_ems.png" alt="Mine" class="img-responsive">
+	</div> <br>
+    <div class="twentytwenty-container">
+	    <img src="images/reference/veach_ems.png" alt="Reference" class="img-responsive">
+	    <img src="images/mine/veach_ems.png" alt="Mine" class="img-responsive">
+	</div> <br>
+    
+
+	<!-- ================================================================= -->
+
+	<h2>Part 2: BRDF Sampling</h2>
+
+    <p>We have to multiply the BSDF with the cosine of incidence ray and normal in microfacet.cpp. Doing this in direct_mats.cpp will
+        fail the t-test.The files modified are microfacet.cpp and direct_mats.cpp. This is the hardest task and it took five days to 
+        complete.</p>
+
+    <h3>Integrator Implementation</h3>
+
+    <p>Since we are sampling from the BSDF perspective, we don't have to iterate through all emitters. Instead, we use the BSDF
+        to sample the incident ray (which is the outgoing ray in BSDF). If this ray intersects with an emitter, we can calculate
+        its radiance. We also need to check whether the first intersection is part of an emitter as in part1. A different 
+        EmitterQueryRecord should be used to distinguish from the one used for the second intersection.
+    </p>
+
+    <h3>Microfacet BRDF</h3>
+
+    <p>The implementation of eval() and pdf() is straightforward as we just need to call various methods that are already implemented.
+        As for sample(), we used the x component of the 'sample' parameter as a random variable and compare it with the value of ks to
+        decide which lobe to choose. Then we use the trick introduced in the lecture to rescale x back to the interval [0,1]. 
+    </p>
+
+    <h3>Validation</h3>
+
+    <p>We passed the second set of five tests in test-mesh.xml and the second set of two tests in test-mesh-furnace.xml. We also passed
+        the t-test and chi2test. The renderred images look similar to the reference images except for some small errors due to the 
+        stochastic nature of Monte-Carlo integration.</p>
+    <div class="twentytwenty-container">
+	    <img src="images/reference/sphere_mats.png" alt="Reference" class="img-responsive">
+	    <img src="images/mine/sphere_mats.png" alt="Mine" class="img-responsive">
+	</div> <br>
+    <div class="twentytwenty-container">
+	    <img src="images/reference/sphere2_mats.png" alt="Reference" class="img-responsive">
+	    <img src="images/mine/sphere2_mats.png" alt="Mine" class="img-responsive">
+	</div> <br>
+    <div class="twentytwenty-container">
+	    <img src="images/reference/odyssey_mats.png" alt="Reference" class="img-responsive">
+	    <img src="images/mine/odyssey_mats.png" alt="Mine" class="img-responsive">
+	</div> <br>
+    <div class="twentytwenty-container">
+	    <img src="images/reference/veach_mats.png" alt="Reference" class="img-responsive">
+	    <img src="images/mine/veach_mats.png" alt="Mine" class="img-responsive">
+	</div> <br>
+    <img src="images/test/chi2test.png" alt="Test results"/> 
+    <br> 
+    <img src="images/test/microfacet_chi2test.png" alt="Test results"/> 
+    <br>
+    <img src="images/test/ttest.png" alt="Test results"/> 
+    <br>
+
+	<!-- ================================================================= -->
+
+    <h2>Part 3: Multiple Importance Sampling</h2>
+
+    <p>After finishing part1 and part2, this part is just combining the two parts. The file modified is direct_mis.cpp and it took less
+        than one day to complete the task. </p>
+
+    <h3>Integrator Implementation</h3>
+
+    <p>Since now we are combining two approaches, it is a good habit to rename some of the variables like EmitterQueryRecord and BSDFQueryRecord
+        with ems and mats contexts. For each approach, we need to calculate the pdf from emitter and BSDF. We also have to check that the sum of 
+        the two pdfs is greater than zero before calculating the weight.
+    </p>
+
+    <h3>Validation</h3>
+
+    <p>We passed the last five tests in test-mesh.xml and the last two tests in test-mesh-furnace.xml. The renderred images look similar to
+        the reference images except for some small errors due to the stochastic nature of Monte-Carlo integration.</p>
+    
+    
+    <img src="images/test/test_mesh.png" alt="Test results"/> <br> 
+    <img src="images/test/test_mesh_furnace.png" alt="Test results"/> <br> 
+    
+
+    <h3>Image Validation</h3>
+
+    <p>TODO: Show a 4-way comparison for each of the 2 scenes in your report. For each scene compare your 3 integrators (direct_ems, direct_mats, direct_mis) with the reference MIS rendering.</p>
+
+    <div class="twentytwenty-container">
+        <img src="images/reference/odyssey_mis.png" alt="Reference" class="img-responsive">
+        <img src="images/mine/odyssey_ems.png" alt="EMS" class="img-responsive">
+        <img src="images/mine/odyssey_mats.png" alt="MATS" class="img-responsive">
+        <img src="images/mine/odyssey_mis.png" alt="MIS" class="img-responsive">
+    </div> <br>
+    <div class="twentytwenty-container">
+        <img src="images/reference/veach_mis.png" alt="Reference" class="img-responsive">
+        <img src="images/mine/veach_ems.png" alt="EMS" class="img-responsive">
+        <img src="images/mine/veach_mats.png" alt="MATS" class="img-responsive">
+        <img src="images/mine/veach_mis.png" alt="MIS" class="img-responsive">
+    </div> <br>
+</div>
+</div>
+
+
+<!-- Bootstrap core JavaScript -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+<script src="resources/bootstrap.min.js"></script>
+<!-- <script src="/js/offcanvas.js"></script> -->
+<script src="resources/jquery.event.move.js"></script>
+<script src="resources/jquery.twentytwenty.js"></script>
+
+
+<script>
+$(window).load(function(){$(".twentytwenty-container").twentytwenty({default_offset_pct: 0.5});});
+</script>
+
+</body>
+</html>

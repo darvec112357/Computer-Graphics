@@ -1,0 +1,147 @@
+<!DOCTYPE html PUBLIC '-//W3C//DTD XHTML 1.0 Transitional//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd'>
+<html xmlns='http://www.w3.org/1999/xhtml' xml:lang='en' lang='en'>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="shortcut icon" type="image/vnd.microsoft.icon" href="../favicon.ico" />
+
+    <title>Computer Graphics - PA1</title>
+
+    <link href="resources/bootstrap.min.css" rel="stylesheet">
+    <link href="resources/offcanvas.css" rel="stylesheet">
+    <link href="resources/custom2014.css" rel="stylesheet">
+    <link href="resources/twentytwenty.css" rel="stylesheet" type="text/css" />
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+
+<body>
+
+<div class="container headerBar">
+		<h1>Programming Assignment 1 - Name Here</h1>
+</div>
+
+<div class="container contentWrapper">
+<div class="pageContent">
+
+	<!-- ================================================================= -->
+
+	<h2>Part 1: Preliminaries</h2>
+
+	<p>After following the instructions, I successfully rendered ajax-normals. This task took me one day.</p>
+
+	<h3>Shading Normal Comparison</h3>
+	<div class="twentytwenty-container">
+	    <img src="images/reference/ajax-normals.png" alt="Reference" class="img-responsive">
+	    <img src="images/mine/ajax-normals.png" alt="Mine" class="img-responsive">
+	</div> <br>
+
+	<!-- ================================================================= -->
+
+	<h2>Part 2: Average Visiblity Integrator</h2>
+
+	<p> To implement AV Integrator, I found the first intersection point. Then I used its normal and the provided sampler to sample a new 
+        vector from the hemisphere. After that I constructed a second ray using the intersection point and the sampled vector and found the 
+        second intersection. White is returned if any of the two rays does not have an intersection, black otherwise.
+        The rendering process took quite a while (about 5-10 min), but in the end I managed to render both ajax-av 
+        and sponza-av. I also passed the test in test-av. At first my image is darker than the reference image. This is because
+        some of the ray will go below (due to calculation rounding error) the surface and the second ray will be blocked by the surface.
+        Setting an Epsilon as second ray's mint addresses the problem. This task took me one day.
+    </p>
+
+	<h3>AV Comparison </h3>
+	<div class="twentytwenty-container">
+	    <img src="images/reference/ajax-av.png" alt="Reference" class="img-responsive">
+	    <img src="images/mine/ajax-av.png" alt="Mine" class="img-responsive">
+	</div> 
+    <div class="twentytwenty-container">
+	    <img src="images/reference/sponza-av.png" alt="Reference" class="img-responsive">
+	    <img src="images/mine/sponza-av.png" alt="Mine" class="img-responsive">
+	</div><br>
+	<!-- ================================================================= -->
+
+	<h2>Part 3: Analytic Sphere Shape</h2>
+
+	<p> To check ray intersection, I combined the analytic equations for sphere and ray to form a quadratic equation. It's worth noting that
+        using dot products is much more convenient than extracting x,y,z values separately and perform algebraic works. I first check 
+        that the discriminant is non-negative, then considered the three separate cases shown in lecture slides. For the method 
+        setHitInformation(), the direction of the normal should be pointing away from the center. In addition, the normal vector should 
+        be normalized (otherwise the resulting sphere will be brighter). As a result, I can render both sphere-analytics and sphere-mesh. 
+        This task took me one day.
+    </p>
+
+	<h3>Sphere Analytic vs Mesh Comparison </h3>
+	<div class="twentytwenty-container">
+	    <img src="images/reference/sphere-analytic.png" alt="Reference" class="img-responsive">
+	    <img src="images/mine/sphere-analytic.png" alt="Mine" class="img-responsive">
+	</div> 
+    <div class="twentytwenty-container">
+	    <img src="images/reference/sphere-mesh.png" alt="Reference" class="img-responsive">
+	    <img src="images/mine/sphere-mesh.png" alt="Mine" class="img-responsive">
+	</div><br>
+
+	<!-- ================================================================= -->
+
+    <h2>Part 4: Direct Illumination Integrator</h2>
+
+    <p> For pointlight.cpp, I set the value for source position, incoming direction and shadowRay in the method sample(). I used the method eval() to
+        calculate the radiance. The formula is given by power/4*pi*r*r, where r is the distance between the pointlight and the first intersection point. 
+        The method pdf() is not relevant for this task, so I just returned 1.0. For direct.cpp, I first generate a EmitterQueryRecord 
+        only using the point of intersection. Then I set the reverse direction of the ray as the outgoing direction as I am tracing from
+        the perspective of eyes. After that I iterated through all pointlights generated in the scene, computing its radiance, followed by 
+        generating a BSDF record and calculating the bsdf value. The cosine value is calculated using the dot product of normalized intersection
+        normals and incoming ray. The color is updated after each iteration of pointlight. In the end, I 
+        successfully rendered sponza-direct and also passed both test (test-direct & test-sponza). This task took me three days.
+    </p>
+
+    <h3>DI Comparison </h3>
+    <div class="twentytwenty-container">
+        <img src="images/reference/sponza-direct.png" alt="Reference" class="img-responsive">
+        <img src="images/mine/sponza-direct.png" alt="Mine" class="img-responsive">
+    </div> <br>
+
+    <!-- ================================================================= -->
+
+    <h2>Part 5: Texture Mapping</h2>
+
+    <p>Firstly, I scaled the uv coordinate to the range [0,1]. To achieve this, I divided the value of u by 2*pi and divided the
+        value of (v-pi) by pi. Next, I divided the scaled uv coordinate by m_scale and added the value of m_delta. Then I rounded
+        up the values to the nearest integer. Finally, I set 
+        the color to be white if the x-y coordinate has the same parity, black otherwise. My implementation was able to render mesh-texture 
+        correctly, but not sphere-texture. I found out that the issue was in my implementation of sphere.cpp, that I failed to consider
+        the intersection cases comprehensively. After fixing the problem in sphere.cpp, I managed to render sphere-texture. This task took me
+        two days.</p>
+
+    <h3>Checkerboard Comparison </h3>
+    <div class="twentytwenty-container">
+        <img src="images/reference/sphere-texture.png" alt="Reference" class="img-responsive">
+        <img src="images/mine/sphere-texture.png" alt="Mine" class="img-responsive">
+    </div>
+    <div class="twentytwenty-container">
+        <img src="images/reference/mesh-texture.png" alt="Reference" class="img-responsive">
+        <img src="images/mine/mesh-texture.png" alt="Mine" class="img-responsive">
+    </div> <br>
+
+    <!-- ================================================================= -->
+</div>
+</div>
+
+
+<!-- Bootstrap core JavaScript -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+<script src="resources/bootstrap.min.js"></script>
+<script src="/js/offcanvas.js"></script>
+<script src="resources/jquery.event.move.js"></script>
+<script src="resources/jquery.twentytwenty.js"></script>
+
+
+<script>
+$(window).load(function(){$(".twentytwenty-container").twentytwenty({default_offset_pct: 0.5});});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,153 @@
+<!DOCTYPE html PUBLIC '-//W3C//DTD XHTML 1.0 Transitional//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd'>
+<html xmlns='http://www.w3.org/1999/xhtml' xml:lang='en' lang='en'>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="shortcut icon" type="image/vnd.microsoft.icon" href="../favicon.ico" />
+
+    <title>Computer Graphics - PA1</title>
+
+    <link href="resources/bootstrap.min.css" rel="stylesheet">
+    <link href="resources/offcanvas.css" rel="stylesheet">
+    <link href="resources/custom2014.css" rel="stylesheet">
+    <link href="resources/twentytwenty.css" rel="stylesheet" type="text/css" />
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <script src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+</head>
+
+<body>
+
+<div class="container headerBar">
+		<h1>Programming Assignment 2 - Liu Rongxing</h1>
+</div>
+
+<div class="container contentWrapper">
+<div class="pageContent">
+
+	<!-- ================================================================= -->
+
+	<h2>Part 1: Sample Warping</h2>
+
+	<p>The first few problems are covered in the lecture. The Beckmann distribution is also manageable with enough hints provided. 
+        Overall this assignment took less than one day.
+    </p>
+
+	<h3>Uniform disk</h3>
+
+    <p>The value of r is calculated by \(\sqrt{\psi_1}\). The value of \(\theta\) is calculated by \(2\pi\psi_2\). The coordinate of resulting
+        point is given by \((r\cdot cos\theta,r\cdot sin\theta)\). The pdf of the distribution is given by $$p_c(x,y)=\begin{cases}\frac{1}{\pi}
+        & \text{\(x^2+y^2\lt 1\)} \\ 0 & \text{otherwise}\end{cases}$$
+    </p>
+
+    <h3>Uniform sphere</h3>
+
+    <p>The value of z is calculated by \(z=2\psi_1-1\). The value of r is calculated by \(r=\sqrt{1-z^2}\). The value of \(\theta\) is calculated by \(2\pi\psi_2\).
+        The coordinate of resulting point is given by \((r\cdot cos\theta,r\cdot sin\theta,z)\). The pdf of the distribution is given by $$p_c(x,y,z)=\begin{cases}\frac{1}{4\pi}
+        & \text{\(x^2+y^2+z^2\lt 1\)} \\ 0 & \text{otherwise}\end{cases}$$
+    </p>
+    
+
+    <h3>Uniform hemisphere</h3>
+
+    <p>The value of z is just \(\psi_1\). The value of r is calculated by \(r=\sqrt{1-z^2}\). The value of \(\theta\) is calculated by \(2\pi\psi_2\).
+        The coordinate of resulting point is given by \((r\cdot cos\theta,r\cdot sin\theta,z)\). The pdf of the distribution is given by $$p_c(x,y,z)=\begin{cases}\frac{1}{2\pi}
+        & \text{\(x^2+y^2+z^2 \lt 1, z \gt 0\)} \\ 0 & \text{otherwise}\end{cases}$$</p>
+    
+
+    <h3>Uniform sphere cap</h3>
+
+    <p>The value of z is calculated by \(\psi_1\cdot (1-cos\theta_{max})+cos\theta_{max}\). The value of r is calculated by \(r=\sqrt{1-z^2}\). The value of \(\theta\) is calculated by \(2\pi\psi_2\).
+        The coordinate of resulting point is given by \((r\cdot cos\theta,r\cdot sin\theta,z)\). The pdf of the distribution is given by $$p_c(x,y,z)=\begin{cases}\frac{1}{2\pi(1-cos\theta_{max})}
+        & \text{\(x^2+y^2+z^2 \lt 1, z \gt cos\theta_{max}\)} \\ 0 & \text{otherwise}\end{cases}$$</p>
+    
+
+    <h3>Cosine hemisphere</h3>
+
+    <p>First sample a point (u,v) from a unit disk using the given values. The value of z is calculated by \(\sqrt{1-u^2-v^2}\). The coordinate of
+        resulting point is given by \((u,v,z)\). The pdf of the distribution is given by $$p_c(x,y,z)=\begin{cases}\frac{cos\theta}{\pi}
+        & \text{\(x^2+y^2+z^2 \lt 1, z \gt 0\)} \\ 0 & \text{otherwise}\end{cases}$$ Where \(\theta\) is the angle between the point on hemisphere 
+        and the normal vector (0,0,1).
+    </p>
+    
+
+    <h3>Beckmann distribution</h3>
+
+    <p>\begin{equation}\begin{aligned}
+        I &=\int_0^{2\pi}\int_0^{\frac{\pi}{2}}p(\theta,\phi)sin\theta d\theta d\phi \\
+          &=\int_0^{2\pi}\int_0^{\frac{\pi}{2}}\frac{e^{\frac{-tan^2\theta}{\alpha^2}}}{\pi\alpha^2cos^3\theta}sin\theta d\theta d\phi \\
+          &=2\int_0^{\frac{\pi}{2}}\frac{e^{\frac{-tan^2\theta}{\alpha^2}}}{\alpha^2cos^3\theta}sin\theta d\theta
+        \end{aligned}\end{equation}
+        Now let \(x=cos\theta\), we have \(tan^2\theta=\frac{1-x^2}{x^2},\frac{dx}{d\theta}=-sin\theta\). Hence, 
+        \begin{equation}\begin{aligned}
+        I &=-\int_1^0\frac{e^{\frac{x^2-1}{\alpha^2x^2}}}{\alpha^2x^3} dx \\
+          &=\int_0^1\frac{e^{\frac{x^2-1}{\alpha^2x^2}}}{\alpha^2x^3} dx
+        \end{aligned}\end{equation}
+        Notice that \((\frac{x^2-1}{\alpha^2x^2})'=\frac{1}{\alpha^2x^3}\). Hence, 
+        $$ I =[e^{\frac{x^2-1}{\alpha^2x^2}}]_0^1 $$ When \(x=1\), we have \(x^2-1=0\) therefore \(e^{\frac{x^2-1}{\alpha^2x^2}}=1\). When
+        \(x=0\), we have \(\frac{x^2-1}{\alpha^2x^2} \to -\infty\) therefore \(e^{\frac{x^2-1}{\alpha^2x^2}}\to 0\). Finally, we have $$I=1$$
+        Using results in above calculation, the cdf of Beckmann distribution with respect to \(\theta\) is given by 
+        \begin{equation}\begin{aligned}
+        cdf(\theta) &=\int_0^{2\pi}\int_0^{\theta}p(\theta,\phi)d\theta d\phi \\
+          &=1-e^{\frac{-tan^2\theta}{\alpha^2}}
+        \end{aligned}\end{equation} Equating this with the x-coordinate of the sampled point, we have 
+        \begin{equation}\begin{aligned}
+        \psi_1 &=1-e^{\frac{-tan^2\theta}{\alpha^2}} \\
+        e^{\frac{-tan^2\theta}{\alpha^2}} &=1-\psi_1 \\
+        tan^2\theta &=-\alpha^2ln(1-\psi_1) \\
+        \theta &=arctan(\sqrt{-\alpha^2ln(1-\psi_1)})
+        \end{aligned}\end{equation} The value of \(\phi\) can be calculated by \(2\pi\psi_2\). The coordinate of resulting point is given by
+        \((sin\theta cos\phi,sin\theta sin\phi,cos\theta)\). The pdf of the distribution is given by 
+        $$p_c(x,y)=\begin{cases}\frac{e^{\frac{-tan^2\theta}{\alpha^2}}}{\pi\alpha^2cos^3\theta}
+        & \text{\(x^2+y^2+z^2 \lt 1, z \gt 0\)} \\ 0 & \text{otherwise}\end{cases}$$</p>
+    
+    <br> <br> <br> <br>
+
+	<!-- ================================================================= -->
+
+	<h2>Part 2: Validation</h2>
+
+	<p>All chi-square tests are passed. </p>
+
+	<h3>Uniform disk</h3>
+    <img src="images/test_disk.png" alt="Uniform disk test"/>
+
+    <h3>Uniform sphere cap (\(\cos{\theta_{max}} = 0.5\))</h3>
+    <img src="images/test_spherecap.png" alt="Uniform sphere cap test"/>
+
+    <h3>Uniform hemisphere</h3>
+    <img src="images/test_hemisphere.png" alt="Uniform hemisphere test"/>
+
+    <h3>Uniform sphere</h3>
+    <img src="images/test_sphere.png" alt="Uniform sphere test"/>
+
+    <h3>Cosine hemisphere</h3>
+    <img src="images/test_hemispherecos.png" alt="Cosine hemisphere test"/>
+
+    <h3>Beckmann distribution (\(\alpha = 0.5\))</h3>
+    <img src="images/test_beckmann.png" alt="Beckmann distribution test"/> <br>
+
+	<!-- ================================================================= -->
+</div>
+</div>
+
+
+<!-- Bootstrap core JavaScript -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+<script src="resources/bootstrap.min.js"></script>
+<script src="/js/offcanvas.js"></script>
+<script src="resources/jquery.event.move.js"></script>
+<script src="resources/jquery.twentytwenty.js"></script>
+
+
+<script>
+$(window).load(function(){$(".twentytwenty-container").twentytwenty({default_offset_pct: 0.5});});
+</script>
+
+</body>
+</html>
